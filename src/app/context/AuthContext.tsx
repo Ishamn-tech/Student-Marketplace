@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabaseClient';
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
-  signup: (email: string, phone: string, password: string, name: string) => Promise<boolean>;
+  signup: (email: string, phone: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   cart: CartItem[];
   addToCart: (item: CartItem) => void;
@@ -197,7 +197,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [rentals, user]);
 
-  const signup = async (email: string, phone: string, password: string, name: string): Promise<boolean> => {
+  const signup = async (email: string, phone: string, password: string, name: string): Promise<{ success: boolean; error?: string }> => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -212,13 +212,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (error) {
         console.error('Signup error:', error.message);
-        return false;
+        return { success: false, error: error.message };
       }
 
-      return !!data.user;
-    } catch (error) {
+      return { success: data.user !== null, error: data.user ? undefined : 'Failed to register user.' };
+    } catch (error: any) {
       console.error('Error during signup:', error);
-      return false;
+      return { success: false, error: error.message || 'An unexpected error occurred during signup.' };
     }
   };
 

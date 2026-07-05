@@ -53,14 +53,14 @@ export default function SignUp() {
     }
 
     setLoading(true);
-    const success = await signup(formData.email, formData.phone, formData.password, formData.name);
+    const result = await signup(formData.email, formData.phone, formData.password, formData.name);
     setLoading(false);
 
-    if (success) {
+    if (result.success) {
       toast.success('Account created successfully!');
       navigate('/');
     } else {
-      toast.error('Email already exists');
+      toast.error(result.error || 'Failed to create account');
     }
   };
 
