@@ -1,5 +1,6 @@
--- Enable UUID extension
+-- Enable UUID and PGCrypto extensions
 create extension if not exists "uuid-ossp";
+create extension if not exists "pgcrypto";
 
 -- 1. PROFILES TABLE (Linked to auth.users)
 create table public.profiles (
@@ -198,13 +199,14 @@ create or replace trigger on_auth_user_created
 
 
 -- 8. SEED DATA FOR MOCK USERS & PRODUCTS
--- We create dummy auth profiles for the mock sellers (with unique UUIDs)
-insert into public.profiles (id, email, phone, name) values
-  ('11111111-1111-1111-1111-111111111111', 'priya.sharma@newhorizonindia.edu', '9876543210', 'Priya Sharma'),
-  ('22222222-2222-2222-2222-222222222222', 'ankit.verma@newhorizonindia.edu', '9876543211', 'Ankit Verma'),
-  ('33333333-3333-3333-3333-333333333333', 'sneha.patel@newhorizonindia.edu', '9876543212', 'Sneha Patel'),
-  ('44444444-4444-4444-4444-444444444444', 'arjun.mehta@newhorizonindia.edu', '9876543213', 'Arjun Mehta'),
-  ('55555555-5555-5555-5555-555555555555', 'kavya.iyer@newhorizonindia.edu', '9876543214', 'Kavya Iyer')
+-- We create dummy auth records for the mock sellers in auth.users
+-- This will automatically trigger the creation of their corresponding public.profiles records!
+insert into auth.users (id, email, encrypted_password, email_confirmed_at, raw_user_meta_data, role, aud) values
+  ('11111111-1111-1111-1111-111111111111', 'priya.sharma@newhorizonindia.edu', crypt('password123', gen_salt('bf')), now(), '{"name": "Priya Sharma", "phone": "9876543210"}', 'authenticated', 'authenticated'),
+  ('22222222-2222-2222-2222-222222222222', 'ankit.verma@newhorizonindia.edu', crypt('password123', gen_salt('bf')), now(), '{"name": "Ankit Verma", "phone": "9876543211"}', 'authenticated', 'authenticated'),
+  ('33333333-3333-3333-3333-333333333333', 'sneha.patel@newhorizonindia.edu', crypt('password123', gen_salt('bf')), now(), '{"name": "Sneha Patel", "phone": "9876543212"}', 'authenticated', 'authenticated'),
+  ('44444444-4444-4444-4444-444444444444', 'arjun.mehta@newhorizonindia.edu', crypt('password123', gen_salt('bf')), now(), '{"name": "Arjun Mehta", "phone": "9876543213"}', 'authenticated', 'authenticated'),
+  ('55555555-5555-5555-5555-555555555555', 'kavya.iyer@newhorizonindia.edu', crypt('password123', gen_salt('bf')), now(), '{"name": "Kavya Iyer", "phone": "9876543214"}', 'authenticated', 'authenticated')
 on conflict (id) do nothing;
 
 -- Insert Mock Products
