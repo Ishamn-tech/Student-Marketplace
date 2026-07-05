@@ -62,7 +62,7 @@ export default function Checkout() {
   const tax = subtotal * 0.05;
   const total = subtotal + tax;
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (!deliveryDate || !deliveryTime) {
       toast.error('Please select delivery date and time');
       return;
